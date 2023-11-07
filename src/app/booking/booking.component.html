@@ -1,0 +1,20 @@
+<div>
+  <h1>TESTE</h1>
+</div>
+
+<div>Booking</div>
+
+<form (ngSubmit)="onSubmit(formInputs)" [formGroup]="formInputs">
+  <div>
+    <label for="username">Username</label>
+    <input
+      type="text"
+      name="username"
+      id="username"
+      formControlName="username"
+    />
+  </div>
+  <div>
+    <button type="submit">SUBMIT</button>
+  </div>
+</form>
