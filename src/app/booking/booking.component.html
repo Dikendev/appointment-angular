@@ -1,19 +1,41 @@
-<div>
-  <h1>TESTE</h1>
-</div>
-
-<div>Booking</div>
-
-<form (ngSubmit)="onSubmit(formInputs)" [formGroup]="formInputs">
-  <div>
-    <label for="username">Username</label>
+<form [formGroup]="formInputs" (ngSubmit)="onSubmit(formInputs)">
+  <mat-form-field class="h-[6.5rem]">
+    <mat-label class="font-bold" for="username">Cliente</mat-label>
     <input
+      matInput
       type="text"
       name="username"
       id="username"
       formControlName="username"
+      class="h-[6rem]"
     />
-  </div>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label class="font-bold" for="bookingDateTime"> Data:</mat-label>
+    <input
+      matInput
+      type="datetime"
+      id="bookingDateTime"
+      name="bookingDateTime"
+      [matDatepicker]="datepicker"
+      formControlName="bookingDateTime"
+    />
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <input matInput />
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="datepicker"
+    ></mat-datepicker-toggle>
+
+    <mat-datepicker #datepicker>
+      <mat-datepicker-actions>
+        <button mat-button matDatepickerCancel>Cancel</button>
+        <button mat-raised-button color="primary" matDatepickerApply>
+          Apply
+        </button>
+      </mat-datepicker-actions>
+    </mat-datepicker>
+  </mat-form-field>
   <div>
     <button type="submit">SUBMIT</button>
   </div>

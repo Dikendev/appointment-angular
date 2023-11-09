@@ -13,6 +13,9 @@ export class BookingComponent implements OnInit {
   ngOnInit(): void {
     this.formInputs = this.formBuilder.group({
       username: [''],
+      bookingDateTime: [''],
+      serviceName: [''],
+      total: [''],
     });
   }
 
