@@ -36,7 +36,22 @@
       </mat-datepicker-actions>
     </mat-datepicker>
   </mat-form-field>
+
+  <mat-form-field class="h-[6.5rem]">
+    <mat-label class="font-bold" for="serviceName">Serviço</mat-label>
+
+    <mat-select name="serviceName" id="serviceName" formControlName="username">
+      <mat-option value="one">First option</mat-option>
+      <mat-option value="two">Second option</mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <div>
-    <button type="submit">SUBMIT</button>
+    <button mat-raised-button color="warn">Resetar</button>
+    <button mat-raised-button color="primary" type="submit">Enviar</button>
   </div>
 </form>
+
+<div class="mt-[2rem]">
+  <app-booking-list></app-booking-list>
+</div>

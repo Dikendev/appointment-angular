@@ -18,6 +18,7 @@ import {
 } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { BookingListComponent } from './booking-list/booking-list.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     BookingComponent,
     HomeComponent,
     NavbarComponent,
+    BookingListComponent,
   ],
   imports: [
     BrowserModule,

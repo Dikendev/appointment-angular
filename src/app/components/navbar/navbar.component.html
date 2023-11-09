@@ -1,14 +1,19 @@
-<a
-  routerLink="/home"
-  routerLinkActive="active"
-  [routerLinkActiveOptions]="{ exact: true }"
-  >HOME</a
+<div
+  class="pl-[1rem] pr-[1rem] h-[3rem] bg-blue-600 top-0 left-0 right-0 flex justify-start items-center gap-2"
 >
-<a
-  routerLink="/booking"
-  routerLinkActive="active"
-  [routerLinkActiveOptions]="{ exact: true }"
-  >BOOKING</a
->
-
+  <a
+    class="p-1 bg-blue-300"
+    routerLink="/home"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    >HOME</a
+  >
+  <a
+    class="p-1 bg-blue-300"
+    routerLink="/booking"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    >BOOKING</a
+  >
+</div>
 <router-outlet></router-outlet>
