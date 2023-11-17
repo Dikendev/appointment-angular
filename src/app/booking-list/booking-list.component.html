@@ -1,1 +1,11 @@
-<p>booking-list works!</p>
+<br />
+<div *ngIf="bookings.length">
+  <div *ngFor="let booking of bookings">
+    <div>
+      {{ booking.startAt | date : "M/d/yy, h:mm a" }} -
+      {{ booking.finishAt | date : "M/d/yy, h:mm a" }} name:
+      {{ booking.client.name }} | service: {{ booking.service.name }} | price:
+      {{ booking.total }}
+    </div>
+  </div>
+</div>
