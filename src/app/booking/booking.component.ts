@@ -1,12 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   OnInit,
-  signal,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Observable, from } from 'rxjs';
 import { HttpServiceService } from '../services/http-service.service';
+import { Service } from '../booking-list/booking-list.component';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-booking',
@@ -14,36 +15,53 @@ import { HttpServiceService } from '../services/http-service.service';
   styleUrls: ['./booking.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookingComponent implements OnInit {
+export class BookingComponent implements OnInit, OnDestroy {
   formInputs!: FormGroup;
-  serviceData!: any;
-
-  serviceSignal = signal(0);
+  servicesData!: Service[];
+  tabs = new Array(7).fill(0).map((_, index) => {
+    const today = new Date();
+    const currentDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + index
+    );
+    const formattedDate = formatDate(currentDate, 'dd/MM', 'en-US');
+    return `Tab ${index + 1}: ${formattedDate}`;
+  });
   ngOnInit(): void {
     this.formInputs = this.formBuilder.group({
       username: [''],
       bookingDateTime: [''],
       serviceName: [''],
     });
+
+    this.getBookings();
+    this.getServices();
+
+    this.formInputs.get('serviceName')?.setValue(2);
+  }
+
+  ngOnDestroy(): void {
+    this.backendService.services().subscribe().unsubscribe();
+    this.backendService.bookings().subscribe().unsubscribe();
   }
 
   constructor(
     private formBuilder: FormBuilder,
-    private readonly serviceApi: HttpServiceService,
-    private apiService: HttpServiceService
+    private backendService: HttpServiceService
   ) {}
 
-  onSubmit(formInputs: FormGroup) {
+  async onSubmit(formInputs: FormGroup) {
     console.log(this.formInputs.value);
-    const data = this.getServices();
-    console.log('Service DATA', this.serviceData);
-    console.log('Service signal', this.serviceSignal());
   }
 
   getServices() {
-    this.apiService.getServices().subscribe((data: any) => {
-      this.serviceData = data;
-      this.serviceSignal.set(data);
-    });
+    this.backendService
+      .services()
+      .subscribe((services) => (this.servicesData = services));
+  }
+
+  getBookings() {
+    this.backendService.bookings().subscribe();
   }
 }
