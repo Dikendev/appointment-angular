@@ -1,0 +1,84 @@
+<div>
+  <div class="w-full h-[10rem]">
+    <div *ngFor="let service of services">
+      <div>
+        <h1>
+          {{ service.name }} | {{ service.price }} |
+          {{ service.requiredTimeMin }} | {{ service.serviceImage }}
+        </h1>
+
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="deleteService(service.name)"
+        >
+          <span class="material-symbols-outlined"> settings </span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <button mat-raised-button color="primary" (click)="getServices()">
+      Get all services
+    </button>
+  </div>
+
+  <div>CREATE SERVICE</div>
+  <form
+    [formGroup]="createServiceFormInputs"
+    (ngSubmit)="onSubmit(createServiceFormInputs)"
+  >
+    <mat-form-field>
+      <mat-label class="font-bold" for="name">Service Name:</mat-label>
+      <input
+        matInput
+        type="text"
+        name="name"
+        id="name"
+        formControlName="name"
+        class="h-[6rem]"
+      />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label class="font-bold" for="price">Price:</mat-label>
+      <input
+        matInput
+        type="number"
+        name="price"
+        id="price"
+        formControlName="price"
+        class="h-[6rem]"
+      />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label class="font-bold" for="requiredTimeMin"
+        >required Time:</mat-label
+      >
+      <input
+        matInput
+        type="number"
+        name="requiredTimeMin"
+        id="requiredTimeMin"
+        formControlName="requiredTimeMin"
+        class="h-[6rem]"
+      />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label class="font-bold" for="serviceImage">Service Image:</mat-label>
+      <input
+        matInput
+        type="text"
+        name="serviceImage"
+        id="serviceImage"
+        formControlName="serviceImage"
+        class="h-[6rem]"
+      />
+    </mat-form-field>
+    <div>
+      <button mat-raised-button color="primary" type="submit">Enviar</button>
+    </div>
+  </form>
+</div>
