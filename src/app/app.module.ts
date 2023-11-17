@@ -19,6 +19,8 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { BookingListComponent } from './booking-list/booking-list.component';
+import { AdminComponent } from './admin/admin.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
@@ -27,6 +29,7 @@ import { BookingListComponent } from './booking-list/booking-list.component';
     HomeComponent,
     NavbarComponent,
     BookingListComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,6 +45,7 @@ import { BookingListComponent } from './booking-list/booking-list.component';
     BrowserAnimationsModule,
     NoopAnimationsModule,
     MatButtonModule,
+    MatTabsModule,
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 
