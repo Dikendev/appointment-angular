@@ -21,6 +21,9 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { BookingListComponent } from './booking-list/booking-list.component';
 import { AdminComponent } from './admin/admin.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { BookingDayComponent } from './booking/booking-day/booking-day.component';
+import { ViewNavComponent } from './booking/view-nav/view-nav.component';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [
@@ -30,6 +33,8 @@ import { MatTabsModule } from '@angular/material/tabs';
     NavbarComponent,
     BookingListComponent,
     AdminComponent,
+    BookingDayComponent,
+    ViewNavComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,6 +51,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     NoopAnimationsModule,
     MatButtonModule,
     MatTabsModule,
+    MatTableModule,
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 
