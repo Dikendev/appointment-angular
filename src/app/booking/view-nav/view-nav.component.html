@@ -1,0 +1,18 @@
+<div class="flex justify-end pr-4 text-center">
+  <a
+    class="p-1 bg-blue-400 hover:cursor-pointer min-w-[4rem]"
+    routerLink="/booking-day"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    >Day</a
+  >
+
+  <a
+    class="p-1 bg-blue-500 hover:cursor-pointer min-w-[4rem]"
+    routerLink="/booking-week"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    >Week</a
+  >
+</div>
+<router-outlet></router-outlet>
