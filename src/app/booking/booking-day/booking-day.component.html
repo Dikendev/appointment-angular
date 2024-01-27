@@ -1,35 +1,7 @@
 <app-view-nav></app-view-nav>
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table">
-  <ng-container matColumnDef="hour">
-    <th mat-header-cell *matHeaderCellDef class="w-[2rem]">Horários</th>
-    <td mat-cell *matCellDef="let element">
-      {{ element.hour }}
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Cliente</th>
-    <td mat-cell *matCellDef="let element">{{ element.name }}</td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr
-    class="cursor-pointer hover:bg-fuchsia-400"
-    mat-row
-    (click)="clickedRows.add(row)"
-    [class.demo-row-is-clicked]="clickedRows.has(row)"
-    *matRowDef="let row; columns: displayedColumns"
-  ></tr>
+<table>
+  <tr>
+    Day
+  </tr>
+  <th>01</th>
 </table>
-
-<div>
-  <h3>Click Log</h3>
-</div>
-
-<div *ngIf="!clickedRows.size">Clicked row will be logged here</div>
-
-<ul>
-  <li *ngFor="let clickedRow of clickedRows">
-    {{ clickedRow.name }}
-  </li>
-</ul>
