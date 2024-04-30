@@ -77,8 +77,17 @@ export class BookingDayComponent {
   displayedColumns: string[] = ['hour', 'name'];
   dataSource = DATA;
   clickedRows = new Set<BookingTable>();
-
   logClickedRow(row: BookingTable): void {
     console.log('Clicked row:', row);
   }
+
+  // dayJanuary() {
+  //   const days: [] = [];
+
+  //   for (let day of days) {
+  //     console.log(day)
+  //     days.push();
+  //     console.log(day);
+  //   }
+  // }
 }

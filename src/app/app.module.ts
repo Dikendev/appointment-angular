@@ -24,6 +24,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BookingDayComponent } from './booking/booking-day/booking-day.component';
 import { ViewNavComponent } from './booking/view-nav/view-nav.component';
 import { MatTableModule } from '@angular/material/table';
+import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,7 @@ import { MatTableModule } from '@angular/material/table';
     AdminComponent,
     BookingDayComponent,
     ViewNavComponent,
+    ConfirmModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,6 +55,7 @@ import { MatTableModule } from '@angular/material/table';
     MatButtonModule,
     MatTabsModule,
     MatTableModule,
+    MatDialogModule,
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 

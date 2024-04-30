@@ -1,7 +1,46 @@
 <app-view-nav></app-view-nav>
 
-<mat-tab-group>
-  <ng-container *ngFor="let tab of tabs; track: tab">
-    <mat-tab [label]="tab">{{ tab }}</mat-tab>
-  </ng-container>
-</mat-tab-group>
+<table class="ml-4 border-2 border-purple-800 border-solid">
+  <tr>
+    <th class="w-16 h-16"></th>
+    <th
+      class="border-b-2 border-r-2 border-purple-800 border-solid"
+      *ngFor="let day of tabs"
+    >
+      {{ day }}
+    </th>
+  </tr>
+  <tr *ngFor="let time of times">
+    <td class="border-r-2 border-purple-800 border-solid">
+      <div class="flex flex-col justify-center gap-4 text-center">
+        <div>
+          <h1>{{ time.hour }}</h1>
+        </div>
+        <div>
+          <p>{{ time.minute }}</p>
+        </div>
+      </div>
+    </td>
+    <td
+      class="border-b-[1px] border-purple-800 border-solid border-r-[1px] bg-green-300 col-span-2"
+      *ngFor="let day of tabs"
+    >
+      <div
+        class="w-full h-[3rem] bg-green-200"
+        (click)="onDayClick({ day, time: time.hour })"
+      >
+        <div *ngIf="isScheduled(day, time.hour)">
+          {{ bookingsByTime[`${day}-${time.hour}-00`].client }}
+        </div>
+      </div>
+      <div
+        class="w-full h-[3rem] bg-green-500"
+        (click)="onDayClick({ day, time: time.minute })"
+      >
+        <div *ngIf="bookingByTime[`${day}-${time.hour}-30`]">
+          {{ bookingsByTime[`${day}-${time.hour}-30`].client }}
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
