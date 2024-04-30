@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>Crate a Schedule</h1>
+<div mat-dialog-content>
+  <p>Here you can create a new schedule</p>
+
+  <h1>Day {{ data.day }}</h1>
+  <h1>Tme {{ data.time }}</h1>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Close</button>
+  <button mat-button cdkFocusInitial (click)="onYesClick()">Create</button>
+</div>
