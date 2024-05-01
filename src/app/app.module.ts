@@ -26,6 +26,7 @@ import { ViewNavComponent } from './booking/view-nav/view-nav.component';
 import { MatTableModule } from '@angular/material/table';
 import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatTabsModule,
     MatTableModule,
     MatDialogModule,
+    DragDropModule,
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
 
