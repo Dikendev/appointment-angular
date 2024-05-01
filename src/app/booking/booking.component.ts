@@ -33,6 +33,7 @@ export interface Data {
 export class BookingComponent implements OnInit, OnDestroy {
   formInputs!: FormGroup;
   servicesData!: Service[];
+  times: Time[] = [];
   tabs = new Array(7).fill(0).map((_, index) => {
     const today = new Date();
     const currentDate = new Date(
@@ -44,20 +45,57 @@ export class BookingComponent implements OnInit, OnDestroy {
     console.log(`Tab ${index + 1}: ${formattedDate}`);
     const weekDays = WEEK_DAYS[currentDate.getDay()];
     console.log(`Tab ${index + 1}: ${weekDays}`);
-    return `${weekDays} ${index + 1}: ${formattedDate}`;
+    return `${weekDays} : ${formattedDate}`;
   });
+  bookingByTime: { [key: string]: any } = {};
 
   mockUsers = [
     {
-      dayTime: 'Mon 1: 01/01',
+      dayTime: 'Tue : 30/04',
       professional: 'Cristina',
-      bookingTime: '10:00',
+      start: '10:00',
+      end: '11:00',
+      serviceName: 'Haircut',
+      client: 'Diego',
+    },
+    {
+      dayTime: 'Wed : 01/05',
+      professional: 'Kennedy',
+      start: '15:00',
+      end: '17:30',
       serviceName: 'Haircut',
       client: 'Diego',
     },
   ];
 
-  bookingByTime: { [key: string]: any } = {};
+  public isBooked(day: string, hour: string, type: 'start' | 'end'): boolean {
+    return this.mockUsers.some((user) => {
+      const startTime = user.start;
+      const endTime = user.end;
+
+      console.log('user.dayTime', user.dayTime);
+      console.log('day', day);
+
+      if (user.dayTime == day) {
+        console.log('samee');
+      }
+
+      if (user.dayTime === day && hour === startTime && type === 'start') {
+        return startTime === hour;
+      } else {
+        return endTime === hour;
+      }
+    });
+  }
+
+  getBookingClient(day: string, hour: string): string {
+    const user = this.mockUsers.find((user) => {
+      const startTime = user.start;
+      return user.dayTime === day && hour === startTime;
+    });
+
+    return user ? user.client : '';
+  }
 
   ngOnInit(): void {
     this.formInputs = this.formBuilder.group({
@@ -66,10 +104,11 @@ export class BookingComponent implements OnInit, OnDestroy {
       serviceName: [''],
     });
 
-    this.getBookings();
-    this.getServices();
+    // this.getBookings();
+    // this.getServices();
     this.bookingDateTime();
     this.formInputs.get('serviceName')?.setValue(2);
+    // this.populate();
   }
 
   ngOnDestroy(): void {
@@ -77,9 +116,17 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.backendService.bookings().subscribe().unsubscribe();
   }
 
-  isScheduled(day: string, time: string): boolean {
-    return this.bookingByTime[`${day}-${time}-00`];
-  }
+  // isScheduled(day: string, time: string): boolean {
+  //   console.log('this.bookingTime', this.bookingByTime);
+  //   console.log(this.bookingByTime[`${day}-${time}-00`]);
+  //   return this.bookingByTime[`${day}-${time}-00`];
+  // }
+
+  // bookingTime(day: string, hour: string) {
+  //   console.log('time', this.bookingByTime[`${day}-${hour}-00`]);
+  //   return this.bookingByTime[`${day}-${hour}-00`].client;
+  // }
+
   constructor(
     private formBuilder: FormBuilder,
     private backendService: HttpServiceService,
@@ -90,12 +137,33 @@ export class BookingComponent implements OnInit, OnDestroy {
     console.log(this.formInputs.value);
   }
 
-  populate(): void {
-    for (const user of this.mockUsers) {
-      const [day, date] = user.dayTime.split(' ');
-      const [hour, minute] = user.bookingTime.split(':');
-      this.bookingByTime[`${day}-${hour}-${minute}`] = user;
+  // populate(): void {
+  //   console.log('Populating');
+  //   for (const user of this.mockUsers) {
+  //     console.log('user', user);
+  //     const [day, date] = user.dayTime.split(' ');
+  //     const [hour, minute] = user.bookingTime.split(':');
+  //     this.bookingByTime[`${day}-${hour}-${minute}`] = user;
+  //   }
+  // }
+
+  validate(day: string, time: string): boolean {
+    console.log('Validating', day);
+    console.log('time', time);
+
+    const slice = day.split(':');
+    const clean = slice.map((word) => word.trim());
+    const cleanTime = `${clean[0]}-10-00`;
+    const found = this.bookingByTime[cleanTime];
+
+    if (found) {
+      console.log('this.bookingByTime', this.bookingByTime);
+      console.log('cleanTime', cleanTime);
+
+      console.log('found', found);
+      return true;
     }
+    return false;
   }
 
   getServices() {
@@ -108,8 +176,6 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.backendService.bookings().subscribe();
   }
 
-  times: Time[] = [];
-
   bookingDateTime() {
     for (let i = 6; i <= 24; i++) {
       const prefixHour = i < 10 ? `0${i}` : `${i}`;
@@ -121,7 +187,7 @@ export class BookingComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDayClick(data: Data): void {
+  public onDayClick(data: Data): void {
     console.log('Day clicked');
     console.log(`${data.day} DAY`);
 
