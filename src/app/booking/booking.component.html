@@ -25,22 +25,27 @@
       class="border-b-[1px] border-purple-800 border-solid border-r-[1px] bg-green-300 col-span-2"
       *ngFor="let day of tabs"
     >
-      <div
-        class="w-full h-[3rem] bg-green-200"
-        (click)="onDayClick({ day, time: time.hour })"
-      >
-        <div *ngIf="isScheduled(day, time.hour)">
-          {{ bookingsByTime[`${day}-${time.hour}-00`].client }}
-        </div>
-      </div>
-      <div
-        class="w-full h-[3rem] bg-green-500"
-        (click)="onDayClick({ day, time: time.minute })"
-      >
-        <div *ngIf="bookingByTime[`${day}-${time.hour}-30`]">
-          {{ bookingsByTime[`${day}-${time.hour}-30`].client }}
-        </div>
-      </div>
+      <ng-container *ngIf="mockUsers">
+        <div
+          *ngIf="isBooked(day, time.hour, 'start'); then found; else empty"
+        ></div>
+
+        <ng-template #found>
+          <div
+            class="w-full h-[3rem] bg-green-200"
+            (click)="onDayClick({ day, time:time.hour })"
+          >
+            {{ getBookingClient(day, time.hour) }}
+          </div>
+        </ng-template>
+
+        <ng-template #empty>
+          <div
+            class="w-full h-[3rem] bg-green-200"
+            (click)="onDayClick({ day, time: time.hour })"
+          ></div>
+        </ng-template>
+      </ng-container>
     </td>
   </tr>
 </table>
