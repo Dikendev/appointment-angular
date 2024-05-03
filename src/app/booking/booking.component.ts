@@ -5,7 +5,7 @@ import { Service } from '../booking-list/booking-list.component';
 import { formatDate } from '@angular/common';
 import { ConstantPool } from '@angular/compiler';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -304,6 +304,8 @@ export class BookingComponent implements OnInit {
   }
 
   public onDayClick(date: string): void {
+    this.cleanButton = true;
+
     const timeRange = this.timeToConfirm;
     const dialogConfig = new MatDialogConfig();
 
@@ -316,6 +318,20 @@ export class BookingComponent implements OnInit {
   }
 
   openDialog(component: any, dialogConfig: MatDialogConfig<Time>): void {
-    this.dialog.open(component, dialogConfig);
+    const dialogReference = this.dialog.open(component, dialogConfig);
+
+    dialogReference.afterClosed().subscribe((result) => {
+      if (result) {
+        console.log('confirmed', result);
+      } else {
+        this.clean();
+
+        console.log('canceled');
+      }
+    });
+
+    setTimeout(() => {
+      this.cleanButton = false;
+    }, 100);
   }
 }
