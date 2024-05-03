@@ -12,7 +12,7 @@
   </tr>
   <tr *ngFor="let time of times">
     <td class="border-r-2 border-purple-800 border-solid">
-      <div class="flex flex-col justify-center gap-4 text-center">
+      <div class="flex flex-col justify-center text-center">
         <div>
           <h1>{{ time.hour }}</h1>
         </div>
@@ -25,10 +25,60 @@
       class="border-b-[1px] border-purple-800 border-solid border-r-[1px] bg-green-300 col-span-2"
       *ngFor="let day of tabs"
     >
-      <ng-container *ngIf="mockUsers">
+      <div class="flex flex-col w-full h-full hover:cursor-pointer">
         <div
-          *ngIf="isBooked(day, time.hour, 'start'); then found; else empty"
-        ></div>
+          class="relative w-full h-full hover:bg-gray-400"
+          [ngClass]="isCellClicked(day, time.hour)"
+          (click)="!cleanButton && onCellClick(day, time.hour)"
+        >
+          <div (mouseenter)="isHoverEnable && hovering()">
+            {{ time.hour }}
+          </div>
+          <div class="w-full h-full" *ngIf="isLastCell(day, time.hour)">
+            <div
+              class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
+            >
+              <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
+                X
+              </button>
+              <button
+                class="w-full bg-green-600 rounded-lg"
+                (click)="onDayClick(day)"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="relative w-full h-full hover:bg-gray-400"
+          [ngClass]="isCellClicked(day, time.minute)"
+          (click)="!cleanButton && onCellClick(day, time.minute)"
+        >
+          <div (mouseenter)="isHoverEnable && hovering()">
+            {{ time.minute }}
+          </div>
+          <div class="w-full h-full" *ngIf="isLastCell(day, time.minute)">
+            <div
+              class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
+            >
+              <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
+                X
+              </button>
+              <button
+                class="w-full bg-green-600 rounded-lg"
+                (click)="onDayClick(day)"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <ng-container *ngIf="mockUsers">
+        <div *ngIf="isBooked(day, time.hour); then found; else empty"></div>
 
         <ng-template #found>
           <div
@@ -41,11 +91,23 @@
 
         <ng-template #empty>
           <div
-            class="w-full h-[3rem] bg-green-200"
-            (click)="onDayClick({ day, time: time.hour })"
-          ></div>
+            class="relative w-full h-[3rem] bg-purple-200 hover:bg-green-400 cursor-pointer"
+            (click)="onEmptyClick(day, time.hour)"
+            [ngClass]="{ 'bg-blue-200': isCellClicked(day, time.hour) }"
+          >
+            <div
+              *ngIf="isCellClicked(day, time.hour)"
+              class="absolute inset-0 flex items-center justify-center"
+            >
+              <button
+                class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700"
+              >
+                x
+              </button>
+            </div>
+          </div>
         </ng-template>
-      </ng-container>
+      </ng-container> -->
     </td>
   </tr>
 </table>
