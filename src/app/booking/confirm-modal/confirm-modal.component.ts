@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Data } from '../booking/booking.component';
+import { Data } from '../booking.component';
 
 @Component({
   selector: 'app-confirm-modal',
