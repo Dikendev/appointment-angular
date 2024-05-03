@@ -27,54 +27,120 @@
     >
       <div class="flex flex-col w-full h-full hover:cursor-pointer">
         <div
-          class="relative w-full h-full hover:bg-gray-400"
-          [ngClass]="isCellClicked(day, time.hour)"
-          (click)="!cleanButton && onCellClick(day, time.hour)"
-        >
-          <div (mouseenter)="isHoverEnable && hovering()">
-            {{ time.hour }}
-          </div>
-          <div class="w-full h-full" *ngIf="isLastCell(day, time.hour)">
-            <div
-              class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
-            >
-              <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
-                X
-              </button>
-              <button
-                class="w-full bg-green-600 rounded-lg"
-                (click)="onDayClick(day)"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
+          *ngIf="
+            isBookingData(day, time.hour);
+            then alreadyBookedHour;
+            else bookingHour
+          "
+        ></div>
 
         <div
-          class="relative w-full h-full hover:bg-gray-400"
-          [ngClass]="isCellClicked(day, time.minute)"
-          (click)="!cleanButton && onCellClick(day, time.minute)"
-        >
-          <div (mouseenter)="isHoverEnable && hovering()">
-            {{ time.minute }}
-          </div>
-          <div class="w-full h-full" *ngIf="isLastCell(day, time.minute)">
-            <div
-              class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
-            >
-              <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
-                X
-              </button>
-              <button
-                class="w-full bg-green-600 rounded-lg"
-                (click)="onDayClick(day)"
+          *ngIf="
+            isBookingData(day, time.minute);
+            then alreadyBookedMinute;
+            else bookingMinute
+          "
+        ></div>
+
+        <ng-template #alreadyBookedHour>
+          <div class="relative w-full h-full hover:bg-gray-400">
+            <div class="bg-blue-800">
+              {{ time.hour }}
+            </div>
+            <div class="w-full h-full" *ngIf="isLastCell(day, time.hour)">
+              <div
+                class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
               >
-                OK
-              </button>
+                <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
+                  X
+                </button>
+                <button
+                  class="w-full bg-green-600 rounded-lg"
+                  (click)="onDayClick(day)"
+                >
+                  OK
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-template>
+
+        <ng-template #alreadyBookedMinute>
+          <div class="relative w-full h-full hover:bg-gray-400">
+            <div class="bg-blue-800">
+              {{ time.minute }}
+            </div>
+            <div class="w-full h-full" *ngIf="isLastCell(day, time.minute)">
+              <div
+                class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
+              >
+                <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
+                  X
+                </button>
+                <button
+                  class="w-full bg-green-600 rounded-lg"
+                  (click)="onDayClick(day)"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div></ng-template
+        >
+
+        <ng-template #bookingHour>
+          <div
+            class="relative w-full h-full hover:bg-gray-400"
+            [ngClass]="getCellClass(day, time.hour)"
+            (click)="!cleanButton && onCellClick(day, time.hour)"
+          >
+            <div (mouseenter)="isHoverEnable && hovering()">
+              {{ time.hour }}
+            </div>
+            <div class="w-full h-full" *ngIf="isLastCell(day, time.hour)">
+              <div
+                class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
+              >
+                <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
+                  X
+                </button>
+                <button
+                  class="w-full bg-green-600 rounded-lg"
+                  (click)="onDayClick(day)"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template #bookingMinute>
+          <div
+            class="relative w-full h-full hover:bg-gray-400"
+            [ngClass]="getCellClass(day, time.minute)"
+            (click)="!cleanButton && onCellClick(day, time.minute)"
+          >
+            <div (mouseenter)="isHoverEnable && hovering()">
+              {{ time.minute }}
+            </div>
+            <div class="w-full h-full" *ngIf="isLastCell(day, time.minute)">
+              <div
+                class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
+              >
+                <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
+                  X
+                </button>
+                <button
+                  class="w-full bg-green-600 rounded-lg"
+                  (click)="onDayClick(day)"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
       </div>
 
       <!-- <ng-container *ngIf="mockUsers">

@@ -24,8 +24,12 @@ export interface TimeRange {
   end: string;
 }
 
-export interface ClickedTimeByDay {
+export interface BookingData {
   [day: string]: string[];
+}
+
+export interface CellClasses {
+  [dayAndTime: string]: string;
 }
 
 @Component({
@@ -40,6 +44,39 @@ export class BookingComponent implements OnInit {
   servicesData!: Service[];
   times: Time[] = [];
   cleanButton: boolean = false;
+
+  bookingData: BookingData = {
+    'Sat : 04/05': ['07:30', '09:30'],
+  };
+
+  bookingByDay: BookingData = {};
+
+  isBookingData(day: string, time: string): boolean {
+    const bookingData = this.bookingData[day];
+
+    if (!bookingData) {
+      return false;
+    }
+
+    const [start, end] = bookingData;
+    const timeRange = this.generateTimeBetween(start, end, 30);
+    const rangeDate = [start, ...timeRange, end];
+    const noDuplicates = this.removeDuplicates(rangeDate);
+
+    if (!this.bookingByDay[day]) {
+      this.bookingByDay[day] = timeRange;
+    }
+
+    return noDuplicates.includes(time);
+  }
+
+  isAlreadyBookend(day: string, time: string): boolean {
+    const bookingData = this.bookingByDay[day];
+
+    if (!bookingData) return false;
+
+    return bookingData.includes(time);
+  }
 
   timeToConfirm!: TimeRange;
 
@@ -81,12 +118,10 @@ export class BookingComponent implements OnInit {
   }
 
   // Define a property to keep track of clicked cells
-  clickedCells: ClickedTimeByDay = {};
-  uniqueTimes: ClickedTimeByDay = {};
+  clickedCells: BookingData = {};
+  uniqueTimes: BookingData = {};
 
-  hovering(): void {
-    console.log('hovering');
-  }
+  hovering(): void {}
 
   isHoverEnable: boolean = false;
   // Function to handle cell click
@@ -141,8 +176,11 @@ export class BookingComponent implements OnInit {
       const uniqueTimes = this.removeDuplicates(allTimesMerged);
 
       this.uniqueTimes[day] = uniqueTimes;
+
+      console.log('clicked', this.uniqueTimes);
       this.have2HoursSelected = true;
       this.canHoverCell();
+      this.updateCellClasses();
       console.log('??????????');
     }
   }
@@ -184,7 +222,29 @@ export class BookingComponent implements OnInit {
     return false;
   }
 
+  cellClasses: CellClasses = {};
+
+  calculateCellClasses() {
+    for (const day of this.tabs) {
+      for (const time of this.times) {
+        const dayAndTime = `${day}-${time.hour}`;
+        this.cellClasses[dayAndTime] = this.isCellClicked(day, time.hour);
+      }
+    }
+  }
+
+  // Call this function whenever data affecting CSS classes changes
+  updateCellClasses() {
+    this.calculateCellClasses();
+  }
+
+  getCellClass(day: string, hour: string): string {
+    const dayAndTime = `${day}-${hour}`;
+    return this.cellClasses[dayAndTime] || '';
+  }
+
   isCellClicked(day: string, time: string): string {
+    console.log('clicked ?????', this.clickedCells);
     if (this.uniqueTimes[day]?.includes(time)) {
       return 'bg-purple-700 hover:bg-blue-700';
     }
