@@ -50,6 +50,11 @@ export class BookingComponent implements OnInit {
   };
 
   bookingByDay: BookingData = {};
+  timeToConfirm!: TimeRange;
+
+  isHoverEnable: boolean = false;
+
+  cellClasses: CellClasses = {};
 
   isBookingData(day: string, time: string): boolean {
     const bookingData = this.bookingData[day];
@@ -77,8 +82,6 @@ export class BookingComponent implements OnInit {
 
     return bookingData.includes(time);
   }
-
-  timeToConfirm!: TimeRange;
 
   tabs = new Array(7).fill(0).map((_, index) => {
     const today = new Date();
@@ -123,7 +126,6 @@ export class BookingComponent implements OnInit {
 
   hovering(): void {}
 
-  isHoverEnable: boolean = false;
   // Function to handle cell click
   onCellClick(day: string, hour: string): void {
     if (this.have2HoursSelected) {
@@ -141,8 +143,11 @@ export class BookingComponent implements OnInit {
       this.uniqueTimes = {};
       this.uniqueTimes[day] = [hour];
 
+      this.cellClasses = {};
+
       this.canHoverCell();
       console.log('pushed and reset clicked cells');
+      this.updateCellClasses();
     } else {
       if (this.clickedCells[day].length === 2) {
         console.log(this.clickedCells[day].length);
@@ -193,6 +198,7 @@ export class BookingComponent implements OnInit {
     console.log('clean function');
     this.clickedCells = {};
     this.uniqueTimes = {};
+    this.cellClasses = {};
 
     console.log('cleaned');
     console.log('clicked', this.clickedCells);
@@ -221,8 +227,6 @@ export class BookingComponent implements OnInit {
     }
     return false;
   }
-
-  cellClasses: CellClasses = {};
 
   calculateCellClasses() {
     for (const day of this.tabs) {
