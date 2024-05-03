@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpServiceService } from '../services/http-service.service';
 import { Service } from '../booking-list/booking-list.component';
@@ -20,8 +15,17 @@ export interface Time {
 }
 
 export interface Data {
-  day: string;
-  time: string;
+  date: string;
+  time: TimeRange;
+}
+
+export interface TimeRange {
+  start: string;
+  end: string;
+}
+
+export interface ClickedTimeByDay {
+  [day: string]: string[];
 }
 
 @Component({
@@ -30,10 +34,15 @@ export interface Data {
   styleUrls: ['./booking.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookingComponent implements OnInit, OnDestroy {
+export class BookingComponent implements OnInit {
+  have2HoursSelected: boolean = false;
   formInputs!: FormGroup;
   servicesData!: Service[];
   times: Time[] = [];
+  cleanButton: boolean = false;
+
+  timeToConfirm!: TimeRange;
+
   tabs = new Array(7).fill(0).map((_, index) => {
     const today = new Date();
     const currentDate = new Date(
@@ -47,14 +56,13 @@ export class BookingComponent implements OnInit, OnDestroy {
     console.log(`Tab ${index + 1}: ${weekDays}`);
     return `${weekDays} : ${formattedDate}`;
   });
-  bookingByTime: { [key: string]: any } = {};
 
   mockUsers = [
     {
-      dayTime: 'Tue : 30/04',
+      dayTime: 'Thu : 02/05',
       professional: 'Cristina',
-      start: '10:00',
-      end: '11:00',
+      start: '06:00',
+      end: '07:30',
       serviceName: 'Haircut',
       client: 'Diego',
     },
@@ -68,23 +76,188 @@ export class BookingComponent implements OnInit, OnDestroy {
     },
   ];
 
-  public isBooked(day: string, hour: string, type: 'start' | 'end'): boolean {
+  timeF(time: string) {
+    console.log(`Time: ${time}`);
+  }
+
+  // Define a property to keep track of clicked cells
+  clickedCells: ClickedTimeByDay = {};
+  uniqueTimes: ClickedTimeByDay = {};
+
+  hovering(): void {
+    console.log('hovering');
+  }
+
+  isHoverEnable: boolean = false;
+  // Function to handle cell click
+  onCellClick(day: string, hour: string): void {
+    if (this.have2HoursSelected) {
+      this.cleanSelected();
+      this.have2HoursSelected = false;
+    }
+
+    console.log(`Day: ${day}`);
+    console.log(`Hour: ${hour}`);
+
+    if (!this.clickedCells[day]) {
+      // if another day reset the clicked cells
+      this.clickedCells = {};
+      this.clickedCells[day] = [hour];
+      this.uniqueTimes = {};
+      this.uniqueTimes[day] = [hour];
+
+      this.canHoverCell();
+      console.log('pushed and reset clicked cells');
+    } else {
+      if (this.clickedCells[day].length === 2) {
+        console.log(this.clickedCells[day].length);
+        // Cannot book more than 2 hours'
+
+        this.clickedCells[day] = [hour];
+        console.log(this.clickedCells);
+        return;
+      }
+
+      console.log('pushing the second hour clicked');
+      //if the second hour is lower then then first hour clicked then swap the hours
+
+      this.clickedCells[day].push(hour);
+
+      const times = this.clickedCells[day];
+      const sortString = this.sortTime(times);
+
+      this.clickedCells[day] = sortString;
+
+      const start = this.clickedCells[day][0];
+      const end = this.clickedCells[day][1];
+
+      this.timeToConfirm = {
+        start,
+        end,
+      };
+
+      const timeBetween = this.generateTimeBetween(start, end, 30);
+      const allTimesMerged = [...this.clickedCells[day], ...timeBetween];
+      const uniqueTimes = this.removeDuplicates(allTimesMerged);
+
+      this.uniqueTimes[day] = uniqueTimes;
+      this.have2HoursSelected = true;
+      this.canHoverCell();
+      console.log('??????????');
+    }
+  }
+
+  canHoverCell(): void {
+    this.isHoverEnable = !this.isHoverEnable;
+  }
+
+  cleanSelected() {
+    console.log('clean function');
+    this.clickedCells = {};
+    this.uniqueTimes = {};
+
+    console.log('cleaned');
+    console.log('clicked', this.clickedCells);
+  }
+
+  clean() {
+    this.cleanButton = true;
+    this.cleanSelected();
+
+    setTimeout(() => {
+      this.cleanButton = false;
+    }, 100);
+  }
+
+  isLastCell(day: string, time: string): boolean {
+    const lastTime = this.uniqueTimes[day];
+
+    if (!lastTime) return false;
+
+    const lastTimeIndex = lastTime[lastTime?.length - 1];
+
+    if (!lastTimeIndex) {
+      return false;
+    } else if (lastTimeIndex === time) {
+      return true;
+    }
+    return false;
+  }
+
+  isCellClicked(day: string, time: string): string {
+    if (this.uniqueTimes[day]?.includes(time)) {
+      return 'bg-purple-700 hover:bg-blue-700';
+    }
+
+    return 'bg-green-700 hover:bg-purple-700';
+  }
+
+  removeDuplicates(times: string[]): string[] {
+    const uniqueStrings = new Set(times);
+    const arrayString = Array.from(uniqueStrings);
+    const stringSorted = this.sortTime(arrayString);
+
+    return stringSorted;
+  }
+
+  sortTime(times: string[]): string[] {
+    return times.sort((a, b) => {
+      return (
+        new Date(`1970/01/01 ${a}`).getTime() -
+        new Date(`1970/01/01 ${b}`).getTime()
+      );
+    });
+  }
+
+  generateTimeBetween(start: string, end: string, interval: number) {
+    const timesBetween: string[] = [];
+
+    const startTime = new Date(`1970/01/01 ${start}`);
+    const endTime = new Date(`1970/01/01 ${end}`);
+
+    let currentTime = startTime;
+    while (currentTime < endTime) {
+      timesBetween.push(this.formatTime(currentTime));
+      currentTime.setMinutes(currentTime.getMinutes() + interval);
+    }
+    return timesBetween;
+  }
+
+  formatTime(date: Date): string {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  public isBooked(day: string, hour: string): boolean {
     return this.mockUsers.some((user) => {
       const startTime = user.start;
       const endTime = user.end;
+      const [bookingDay, bookingMonth] = user.dayTime
+        .split(' : ')[1]
+        .split('/');
+      const currentDay = parseInt(bookingDay, 10);
+      const currentMonth = parseInt(bookingMonth, 10);
 
-      console.log('user.dayTime', user.dayTime);
-      console.log('day', day);
-
-      if (user.dayTime == day) {
-        console.log('samee');
+      // Check if the time falls between start and end times
+      if (
+        user.dayTime === day &&
+        parseInt(hour.split(':')[0]) >= parseInt(startTime.split(':')[0]) &&
+        parseInt(hour.split(':')[0]) <= parseInt(endTime.split(':')[0])
+      ) {
+        return true;
       }
-
-      if (user.dayTime === day && hour === startTime && type === 'start') {
-        return startTime === hour;
-      } else {
-        return endTime === hour;
+      // Check if the time falls between the previous day's end time and the current booking's start time
+      else if (
+        currentDay > 0 &&
+        this.tabs.indexOf(day) > 0 &&
+        this.tabs[this.tabs.indexOf(day) - 1].includes(bookingMonth) &&
+        parseInt(hour.split(':')[0]) >= parseInt(endTime.split(':')[0]) &&
+        parseInt(hour.split(':')[0]) < parseInt(startTime.split(':')[0])
+      ) {
+        return true;
       }
+      return false;
     });
   }
 
@@ -104,28 +277,10 @@ export class BookingComponent implements OnInit, OnDestroy {
       serviceName: [''],
     });
 
-    // this.getBookings();
-    // this.getServices();
     this.bookingDateTime();
     this.formInputs.get('serviceName')?.setValue(2);
     // this.populate();
   }
-
-  ngOnDestroy(): void {
-    this.backendService.services().subscribe().unsubscribe();
-    this.backendService.bookings().subscribe().unsubscribe();
-  }
-
-  // isScheduled(day: string, time: string): boolean {
-  //   console.log('this.bookingTime', this.bookingByTime);
-  //   console.log(this.bookingByTime[`${day}-${time}-00`]);
-  //   return this.bookingByTime[`${day}-${time}-00`];
-  // }
-
-  // bookingTime(day: string, hour: string) {
-  //   console.log('time', this.bookingByTime[`${day}-${hour}-00`]);
-  //   return this.bookingByTime[`${day}-${hour}-00`].client;
-  // }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -135,45 +290,6 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   async onSubmit(formInputs: FormGroup) {
     console.log(this.formInputs.value);
-  }
-
-  // populate(): void {
-  //   console.log('Populating');
-  //   for (const user of this.mockUsers) {
-  //     console.log('user', user);
-  //     const [day, date] = user.dayTime.split(' ');
-  //     const [hour, minute] = user.bookingTime.split(':');
-  //     this.bookingByTime[`${day}-${hour}-${minute}`] = user;
-  //   }
-  // }
-
-  validate(day: string, time: string): boolean {
-    console.log('Validating', day);
-    console.log('time', time);
-
-    const slice = day.split(':');
-    const clean = slice.map((word) => word.trim());
-    const cleanTime = `${clean[0]}-10-00`;
-    const found = this.bookingByTime[cleanTime];
-
-    if (found) {
-      console.log('this.bookingByTime', this.bookingByTime);
-      console.log('cleanTime', cleanTime);
-
-      console.log('found', found);
-      return true;
-    }
-    return false;
-  }
-
-  getServices() {
-    this.backendService
-      .services()
-      .subscribe((services) => (this.servicesData = services));
-  }
-
-  getBookings() {
-    this.backendService.bookings().subscribe();
   }
 
   bookingDateTime() {
@@ -187,17 +303,13 @@ export class BookingComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onDayClick(data: Data): void {
-    console.log('Day clicked');
-    console.log(`${data.day} DAY`);
-
-    console.log(`${data.time} time`);
-
+  public onDayClick(date: string): void {
+    const timeRange = this.timeToConfirm;
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {
-      day: data.day,
-      time: data.time,
+      date,
+      time: { start: timeRange.start, end: timeRange.end },
     };
 
     this.openDialog(ConfirmModalComponent, dialogConfig);
