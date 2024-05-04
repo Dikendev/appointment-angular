@@ -2,31 +2,12 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpServiceService } from '../services/http-service.service';
 import { Service } from '../booking-list/booking-list.component';
-import { formatDate } from '@angular/common';
-import { ConstantPool } from '@angular/compiler';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
+import { BookingData, Time, TimeRange } from './interfaces/book-data.interface';
+import { formatDate } from '@angular/common';
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-export interface Time {
-  hour: string;
-  minute: string;
-}
-
-export interface Data {
-  date: string;
-  time: TimeRange;
-}
-
-export interface TimeRange {
-  start: string;
-  end: string;
-}
-
-export interface BookingData {
-  [day: string]: string[];
-}
 
 export interface CellClasses {
   [dayAndTime: string]: string;
@@ -39,29 +20,69 @@ export interface CellClasses {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookingComponent implements OnInit {
-  have2HoursSelected: boolean = false;
+  newDate = new Date();
+  weekDays = WEEK_DAYS;
   formInputs!: FormGroup;
+
   servicesData!: Service[];
   times: Time[] = [];
+  tabs: string[] = [];
+
+  bookingInformation = {};
+  bookingByDay: BookingData = {};
+  cellClasses: CellClasses = {};
+
   cleanButton: boolean = false;
+  have2HoursSelected: boolean = false;
+  isHoverEnable: boolean = false;
+
+  timeToConfirm!: TimeRange;
 
   bookingData: BookingData = {
     'Sat : 04/05': ['07:30', '09:30'],
+    'Sun : 28/04': ['08:30', '10:30'],
+    'Wed : 01/05': ['12:00', '13:00'],
   };
 
-  bookingByDay: BookingData = {};
-  timeToConfirm!: TimeRange;
+  mockUsers = [
+    {
+      dayTime: 'Thu : 02/05',
+      professional: 'Cristina',
+      start: '06:00',
+      end: '07:30',
+      serviceName: 'Haircut',
+      client: 'Diego',
+    },
+    {
+      dayTime: 'Wed : 01/05',
+      professional: 'Kennedy',
+      start: '15:00',
+      end: '17:30',
+      serviceName: 'Haircut',
+      client: 'Diego',
+    },
+  ];
 
-  isHoverEnable: boolean = false;
+  constructor(
+    private formBuilder: FormBuilder,
+    private backendService: HttpServiceService,
+    public dialog: MatDialog
+  ) {}
 
-  cellClasses: CellClasses = {};
+  firstCell(day: string, time: string): boolean {
+    const bookingData = this.bookingData[day];
+
+    if (!bookingData) return false;
+
+    const [start] = bookingData;
+    console.log('start', start);
+    return start === time;
+  }
 
   isBookingData(day: string, time: string): boolean {
     const bookingData = this.bookingData[day];
 
-    if (!bookingData) {
-      return false;
-    }
+    if (!bookingData) return false;
 
     const [start, end] = bookingData;
     const timeRange = this.generateTimeBetween(start, end, 30);
@@ -83,41 +104,38 @@ export class BookingComponent implements OnInit {
     return bookingData.includes(time);
   }
 
-  tabs = new Array(7).fill(0).map((_, index) => {
-    const today = new Date();
-    const currentDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate() + index
-    );
-    const formattedDate = formatDate(currentDate, 'dd/MM', 'en-US');
-    console.log(`Tab ${index + 1}: ${formattedDate}`);
-    const weekDays = WEEK_DAYS[currentDate.getDay()];
-    console.log(`Tab ${index + 1}: ${weekDays}`);
-    return `${weekDays} : ${formattedDate}`;
-  });
+  populateWeekDays() {
+    this.tabs = this.generateWeekDays();
+  }
 
-  mockUsers = [
-    {
-      dayTime: 'Thu : 02/05',
-      professional: 'Cristina',
-      start: '06:00',
-      end: '07:30',
-      serviceName: 'Haircut',
-      client: 'Diego',
-    },
-    {
-      dayTime: 'Wed : 01/05',
-      professional: 'Kennedy',
-      start: '15:00',
-      end: '17:30',
-      serviceName: 'Haircut',
-      client: 'Diego',
-    },
-  ];
+  findIndexToStart() {
+    const date = this.newDate;
+    const actualDay = this.weekDays[date.getDay()];
+    return this.findActualDayIndex(actualDay.toString());
+  }
 
-  timeF(time: string) {
-    console.log(`Time: ${time}`);
+  findActualDayIndex(today: string): number {
+    const todayIndex = this.weekDays.indexOf(today);
+    return -todayIndex;
+  }
+
+  generateWeekDays() {
+    const indexToStart = this.findIndexToStart();
+    return new Array(7).fill(0).map((_, index) => {
+      const today = this.newDate;
+
+      const diffIndex = index + indexToStart;
+      const currentDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() + diffIndex
+      );
+
+      const weekDays = WEEK_DAYS[currentDate.getDay()];
+      const formattedDate = formatDate(currentDate, 'dd/MM', 'en-US');
+
+      return `${weekDays} : ${formattedDate}`;
+    });
   }
 
   // Define a property to keep track of clicked cells
@@ -138,12 +156,10 @@ export class BookingComponent implements OnInit {
 
     if (!this.clickedCells[day]) {
       // if another day reset the clicked cells
-      this.clickedCells = {};
-      this.clickedCells[day] = [hour];
-      this.uniqueTimes = {};
-      this.uniqueTimes[day] = [hour];
+      this.resetTable();
 
-      this.cellClasses = {};
+      this.clickedCells[day] = [hour];
+      this.uniqueTimes[day] = [hour];
 
       this.canHoverCell();
       console.log('pushed and reset clicked cells');
@@ -190,6 +206,12 @@ export class BookingComponent implements OnInit {
     }
   }
 
+  resetTable() {
+    this.clickedCells = {};
+    this.uniqueTimes = {};
+    this.cellClasses = {};
+  }
+
   canHoverCell(): void {
     this.isHoverEnable = !this.isHoverEnable;
   }
@@ -216,6 +238,8 @@ export class BookingComponent implements OnInit {
   isLastCell(day: string, time: string): boolean {
     const lastTime = this.uniqueTimes[day];
 
+    console.log('this.uniqueTimes', this.uniqueTimes);
+
     if (!lastTime) return false;
 
     const lastTimeIndex = lastTime[lastTime?.length - 1];
@@ -231,8 +255,13 @@ export class BookingComponent implements OnInit {
   calculateCellClasses() {
     for (const day of this.tabs) {
       for (const time of this.times) {
-        const dayAndTime = `${day}-${time.hour}`;
-        this.cellClasses[dayAndTime] = this.isCellClicked(day, time.hour);
+        const dayAndTimeStart = `${day}-${time.hour}`;
+
+        const dayAndTimeEnd = `${day}-${time.minute}`;
+
+        this.cellClasses[dayAndTimeStart] = this.isCellClicked(day, time.hour);
+
+        this.cellClasses[dayAndTimeEnd] = this.isCellClicked(day, time.minute);
       }
     }
   }
@@ -242,8 +271,8 @@ export class BookingComponent implements OnInit {
     this.calculateCellClasses();
   }
 
-  getCellClass(day: string, hour: string): string {
-    const dayAndTime = `${day}-${hour}`;
+  getCellClass(day: string, time: string): string {
+    const dayAndTime = `${day}-${time}`;
     return this.cellClasses[dayAndTime] || '';
   }
 
@@ -335,6 +364,8 @@ export class BookingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.populateWeekDays();
+
     this.formInputs = this.formBuilder.group({
       username: [''],
       bookingDateTime: [''],
@@ -345,12 +376,6 @@ export class BookingComponent implements OnInit {
     this.formInputs.get('serviceName')?.setValue(2);
     // this.populate();
   }
-
-  constructor(
-    private formBuilder: FormBuilder,
-    private backendService: HttpServiceService,
-    public dialog: MatDialog
-  ) {}
 
   async onSubmit(formInputs: FormGroup) {
     console.log(this.formInputs.value);

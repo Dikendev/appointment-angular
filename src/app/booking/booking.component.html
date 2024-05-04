@@ -44,49 +44,43 @@
 
         <ng-template #alreadyBookedHour>
           <div class="relative w-full h-full hover:bg-gray-400">
-            <div class="bg-blue-800">
-              {{ time.hour }}
-            </div>
-            <div class="w-full h-full" *ngIf="isLastCell(day, time.hour)">
-              <div
-                class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
-              >
-                <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
-                  X
-                </button>
-                <button
-                  class="w-full bg-green-600 rounded-lg"
-                  (click)="onDayClick(day)"
-                >
-                  OK
-                </button>
+            <ng-component
+              *ngIf="
+                firstCell(day, time.hour);
+                then button_hour;
+                else normalTime_hour
+              "
+            ></ng-component>
+
+            <ng-template #button_hour>
+              <div class="bg-blue-800">BUTTON</div>
+            </ng-template>
+
+            <ng-template #normalTime_hour>
+              <div class="bg-blue-800">
+                {{ time.hour }}
               </div>
-            </div>
+            </ng-template>
           </div>
         </ng-template>
 
         <ng-template #alreadyBookedMinute>
           <div class="relative w-full h-full hover:bg-gray-400">
-            <div class="bg-blue-800">
-              {{ time.minute }}
-            </div>
-            <div class="w-full h-full" *ngIf="isLastCell(day, time.minute)">
-              <div
-                class="absolute bf- w-full z-[100] top-0 right-[-86px] flex gap-1 bg-purple-700 hover:bg-blue-700"
-              >
-                <button class="w-full bg-red-600 rounded-lg" (click)="clean()">
-                  X
-                </button>
-                <button
-                  class="w-full bg-green-600 rounded-lg"
-                  (click)="onDayClick(day)"
-                >
-                  OK
-                </button>
+            <ng-component
+              *ngIf="firstCell(day, time.minute); then button; else normalTime"
+            ></ng-component>
+
+            <ng-template #button>
+              <div class="bg-blue-800">BUTTON</div>
+            </ng-template>
+
+            <ng-template #normalTime>
+              <div class="bg-blue-800">
+                {{ time.minute }}
               </div>
-            </div>
-          </div></ng-template
-        >
+            </ng-template>
+          </div>
+        </ng-template>
 
         <ng-template #bookingHour>
           <div
